@@ -18,6 +18,7 @@ package org.springframework.quoters;
 
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class QuoteController {
+
+    private static final Logger logger = Logger.getLogger(QuoteController.class.getName());
 
 	private final static Quote NONE = new Quote("None");
 	private final static Random RANDOMIZER = new Random();
@@ -38,7 +41,7 @@ public class QuoteController {
 
 	@GetMapping("/api")
 	public List<QuoteResource> getAll() {
-
+		logger.info( String.format("Initiating request for all quotes.")  );
 		return repository.findAll().stream()
 			.map(quote -> new QuoteResource(quote, "success"))
 			.collect(Collectors.toList());
@@ -46,7 +49,7 @@ public class QuoteController {
 
 	@GetMapping("/api/{id}")
 	public QuoteResource getOne(@PathVariable Long id) {
-
+		logger.info( String.format("Initiating request for a quote with id=%s.", id)  );
 		return repository.findById(id)
 			.map(quote -> new QuoteResource(quote, "success"))
 			.orElse(new QuoteResource(NONE, "Quote " + id + " does not exist"));
@@ -54,6 +57,7 @@ public class QuoteController {
 
 	@GetMapping("/api/random")
 	public QuoteResource getRandomOne() {
+		logger.info( String.format("Initiating request for random quote.")  );
 		return getOne(nextLong(1, repository.count() + 1));
 	}
 
